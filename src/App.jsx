@@ -3,6 +3,7 @@ import { RouterProvider } from "react-router-dom";
 import { useDispatch } from 'react-redux';
 import { login } from './store/authSlice';
 import routers from "./pages/Routing";
+import "./App.css";
 
 function App() {
     const dispatch = useDispatch();

@@ -5,8 +5,8 @@ import { login } from "../store/authSlice";
 import { mockUsers } from "../mockData/mockUsers";
 
 const Login = () => {
-    const [userName, setUserName] = useState("");
-    const [password, setPassword] = useState("");
+    const [userName, setUserName] = useState("AdminUser");
+    const [password, setPassword] = useState("admin123");
     const [loginStatus, setLoginStatus] = useState(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -18,7 +18,7 @@ const Login = () => {
         );
         if (user) {
             dispatch(login({
-                userRole: user.userRole,
+                userRole: user.role,
                 userId: user.userId,
                 userName: user.userName,
                 loggedIn: true
@@ -33,8 +33,8 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-teal-100 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-2xl">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                         Sign in to your account
@@ -78,14 +78,14 @@ const Login = () => {
                     <div>
                         <button
                             type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out transform hover:-translate-y-1 hover:scale-105"
                         >
                             Sign in
                         </button>
                     </div>
                 </form>
                 {loginStatus && (
-                    <div className={`mt-4 text-center ${loginStatus.includes("successfully") ? "text-green-600" : "text-red-600"}`}>
+                    <div className={`mt-4 text-center ${loginStatus.includes("successfully") ? "text-green-600" : "text-red-600"} font-semibold`}>
                         {loginStatus}
                     </div>
                 )}

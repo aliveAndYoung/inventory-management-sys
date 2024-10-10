@@ -1,27 +1,28 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { FiEdit, FiTrash2, FiPlus, FiX } from 'react-icons/fi';
 import { selectIsDarkMode } from '../store/themeSlice';
-import { mockSuppliers } from '../mockData/mockSuppliers';
+import { mockUsers } from '../mockData/mockUsers';
 import '../styles/colors.css';
 
-const SuppliersManagement = () => {
-  const [suppliers, setSuppliers] = useState(mockSuppliers);
+const UserManagement = () => {
+  const [users, setUsers] = useState(mockUsers);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [showForm, setShowForm] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
 
   const isDarkMode = useSelector(selectIsDarkMode);
 
   useEffect(() => {
-    setIsVisible(true);
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
-  const sortedSuppliers = useMemo(() => {
-    let sortableSuppliers = [...suppliers];
+  const sortedUsers = useMemo(() => {
+    let sortableUsers = [...users];
     if (sortConfig.key !== null) {
-      sortableSuppliers.sort((a, b) => {
+      sortableUsers.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
@@ -31,8 +32,8 @@ const SuppliersManagement = () => {
         return 0;
       });
     }
-    return sortableSuppliers;
-  }, [suppliers, sortConfig]);
+    return sortableUsers;
+  }, [users, sortConfig]);
 
   const requestSort = (key) => {
     let direction = 'ascending';
@@ -42,45 +43,47 @@ const SuppliersManagement = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleDelete = (supplierId) => {
-    if (window.confirm('Are you sure you want to delete this supplier?')) {
-      setSuppliers(prevSuppliers => prevSuppliers.filter(supplier => supplier.id !== supplierId));
+  const handleDelete = (userId) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
     }
   };
 
-  const handleEdit = (supplier) => {
-    setEditingSupplier(supplier);
+  const handleEdit = (user) => {
+    setEditingUser(user);
     setShowForm(true);
   };
 
-  const handleAddOrUpdateSupplier = (newSupplier) => {
-    if (editingSupplier) {
-      setSuppliers(prevSuppliers =>
-        prevSuppliers.map(supplier =>
-          supplier.id === editingSupplier.id ? { ...supplier, ...newSupplier } : supplier
+  const handleAddOrUpdateUser = (newUser) => {
+    if (editingUser) {
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.id === editingUser.id ? { ...user, ...newUser } : user
         )
       );
     } else {
-      setSuppliers(prevSuppliers => [...prevSuppliers, { ...newSupplier, id: Date.now() }]);
+      setUsers(prevUsers => [...prevUsers, { ...newUser, id: Date.now() }]);
     }
     setShowForm(false);
-    setEditingSupplier(null);
+    setEditingUser(null);
   };
 
   return (
     <div 
-      className={`p-6 min-h-screen transition-opacity duration-500 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+      className={`transition-opacity duration-500 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
       style={{
         backgroundColor: 'var(--color-background)',
-        color: 'var(--color-text-primary)'
+        color: 'var(--color-text-primary)',
+        minHeight: '100vh',
+        padding: '1.5rem'
       }}
     >
-      <h1 className="text-3xl font-bold mb-6">Suppliers Management</h1>
+      <h1 className="text-3xl font-bold mb-6">User Management</h1>
       
       <div className="mb-6">
         <button
           onClick={() => {
-            setEditingSupplier(null);
+            setEditingUser(null);
             setShowForm(true);
           }}
           className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
@@ -89,7 +92,7 @@ const SuppliersManagement = () => {
             color: "var(--color-text-primary)",
           }}
         >
-          <FiPlus className="inline-block mr-2" /> Add Supplier
+          <FiPlus className="inline-block mr-2" /> Add User
         </button>
       </div>
 
@@ -102,7 +105,7 @@ const SuppliersManagement = () => {
         }}>
           <thead>
             <tr style={{ backgroundColor: 'var(--color-card-background)' }}>
-              {['Supplier Name', 'Contact Info', 'Actions'].map((header) => (
+              {['userName', 'Email', 'Role', 'Actions'].map((header) => (
                 <th key={header} 
                     className="px-4 py-2 font-bold text-sm uppercase tracking-wider cursor-pointer hover:bg-opacity-80 transition duration-300"
                     style={{ 
@@ -112,7 +115,7 @@ const SuppliersManagement = () => {
                       textAlign: 'left',
                       verticalAlign: 'middle'
                     }}
-                    onClick={() => header !== 'Actions' && requestSort(header.toLowerCase().replace(' ', ''))}
+                    onClick={() => header !== 'Actions' && requestSort(header.toLowerCase())}
                 >
                   {header}
                 </th>
@@ -120,23 +123,26 @@ const SuppliersManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {sortedSuppliers.map(supplier => (
-              <tr key={supplier.id} className="hover:bg-opacity-50 transition duration-300">
+            {sortedUsers.map(user => (
+              <tr key={user.id} className="hover:bg-opacity-50 transition duration-300">
                 <td className="px-4 py-2 text-sm font-medium" style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--table-border-color)' }}>
-                  {supplier.name}
+                  {user.userName}
                 </td>
                 <td className="px-4 py-2 text-sm" style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--table-border-color)' }}>
-                  {supplier.contactInfo}
+                  {user.email}
+                </td>
+                <td className="px-4 py-2 text-sm" style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--table-border-color)' }}>
+                  {user.role}
                 </td>
                 <td className="px-4 py-2 text-sm" style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--table-border-color)' }}>
                   <button 
-                    onClick={() => handleEdit(supplier)}
+                    onClick={() => handleEdit(user)}
                     className="text-blue-500 hover:text-blue-600 mr-2 transition duration-300"
                   >
                     <FiEdit />
                   </button>
                   <button 
-                    onClick={() => handleDelete(supplier.id)}
+                    onClick={() => handleDelete(user.id)}
                     className="text-red-500 hover:text-red-600 transition duration-300"
                   >
                     <FiTrash2 />
@@ -149,23 +155,25 @@ const SuppliersManagement = () => {
       </div>
 
       {showForm && (
-        <SupplierForm
+        <UserForm
           onClose={() => {
             setShowForm(false);
-            setEditingSupplier(null);
+            setEditingUser(null);
           }}
-          onSubmit={handleAddOrUpdateSupplier}
-          initialData={editingSupplier}
+          onSubmit={handleAddOrUpdateUser}
+          initialData={editingUser}
         />
       )}
     </div>
   );
 };
 
-const SupplierForm = ({ onClose, onSubmit, initialData }) => {
+const UserForm = ({ onClose, onSubmit, initialData }) => {
   const [formData, setFormData] = useState({
-    name: initialData?.name || '',
-    contactInfo: initialData?.contactInfo || ''
+    userName: initialData?.userName || '',
+    email: initialData?.email || '',
+    role: initialData?.role || 'user',
+    password: ''
   });
 
   const handleChange = (e) => {
@@ -192,16 +200,16 @@ const SupplierForm = ({ onClose, onSubmit, initialData }) => {
           <FiX size={24} />
         </button>
         <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
-          {initialData ? 'Edit Supplier' : 'Add New Supplier'}
+          {initialData ? 'Edit User' : 'Add New User'}
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="userName"
+              value={formData.userName}
               onChange={handleChange}
-              placeholder="Supplier Name"
+              placeholder="userName"
               className="w-full p-2 border rounded"
               style={{
                 backgroundColor: 'var(--color-input-background)',
@@ -211,11 +219,11 @@ const SupplierForm = ({ onClose, onSubmit, initialData }) => {
               required
             />
             <input
-              type="text"
-              name="contactInfo"
-              value={formData.contactInfo}
+              type="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
-              placeholder="Contact Info"
+              placeholder="Email"
               className="w-full p-2 border rounded"
               style={{
                 backgroundColor: 'var(--color-input-background)',
@@ -224,6 +232,37 @@ const SupplierForm = ({ onClose, onSubmit, initialData }) => {
               }}
               required
             />
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              style={{
+                backgroundColor: 'var(--color-input-background)',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-primary)'
+              }}
+              required
+            >
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+            {!initialData && (
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Password"
+                className="w-full p-2 border rounded"
+                style={{
+                  backgroundColor: 'var(--color-input-background)',
+                  borderColor: 'var(--color-border)',
+                  color: 'var(--color-text-primary)'
+                }}
+                required
+              />
+            )}
           </div>
           <button
             type="submit"
@@ -233,7 +272,7 @@ const SupplierForm = ({ onClose, onSubmit, initialData }) => {
               color: 'var(--color-text-primary)'
             }}
           >
-            {initialData ? 'Update Supplier' : 'Add Supplier'}
+            {initialData ? 'Update User' : 'Add User'}
           </button>
         </form>
       </div>
@@ -241,4 +280,4 @@ const SupplierForm = ({ onClose, onSubmit, initialData }) => {
   );
 };
 
-export default SuppliersManagement;
+export default UserManagement;

@@ -1,13 +1,13 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import Layout from "../components/shared/Layout";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 import InventoryList from "./InventoryList";
-import ItemForm from "./ItemForm";
-import OrdersManagement from "./OrdersManagement";
 import SuppliersManagement from "./SuppliersManagement";
 import Reports from "./Reports";
-import Settings from "./Settings";
+import ProtectedRoute from "./ProtectedRoute";
+import CategoriesManagement from "./CategoriesManagement";
+import UserManagement from "./UserManagement";
 
 const routers = createBrowserRouter([
     {
@@ -16,41 +16,44 @@ const routers = createBrowserRouter([
     },
     {
         path: "/",
-        element: <Layout />,
+        element: <ProtectedRoute />,
         children: [
             {
-                path: "/",
-                element: <Dashboard />,
-            },
-            {
-                path: "/inventory",
-                element: <InventoryList />,
-            },
-            {
-                path: "/item/:id?",
-                element: <ItemForm />,
-            },
-            {
-                path: "/orders",
-                element: <InventoryList />,
-            },
-            {
-                path: "/suppliers",
-                element: <SuppliersManagement />,
-            },
-            {
-                path: "/reports",
-                element: <Reports />,
-            },
-            {
-                path: "/settings",
-                element: <Settings />,
-            },
-            {
-                path: "/profile",
-                element: <OrdersManagement />,
+                element: <Layout />,
+                children: [
+                    {
+                        path: "/",
+                        element: <Dashboard />,
+                    },
+                    {
+                        path: "/inventory",
+                        element: <InventoryList />,
+                    },
+                    {
+                        path: "/manage-categories",
+                        element: <CategoriesManagement />,
+                    },
+
+                    {
+                        path: "/manage-suppliers",
+                        element: <SuppliersManagement />,
+                    },
+                    {
+                        path: "/reports",
+
+                        element: <Reports />,
+                    },
+                    {
+                        path: "/manage-users",
+                        element: <UserManagement />,
+                    },
+                ],
             },
         ],
+    },
+    {
+        path: "*",
+        element: <Navigate to="/" replace />,
     },
 ]);
 

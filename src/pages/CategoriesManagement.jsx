@@ -1,27 +1,28 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { FiEdit, FiTrash2, FiPlus, FiX } from 'react-icons/fi';
 import { selectIsDarkMode } from '../store/themeSlice';
-import { mockSuppliers } from '../mockData/mockSuppliers';
+import { mockCategories } from '../mockData/mockCategories';
 import '../styles/colors.css';
 
-const SuppliersManagement = () => {
-  const [suppliers, setSuppliers] = useState(mockSuppliers);
+const CategoriesManagement = () => {
+  const [categories, setCategories] = useState(mockCategories);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [showForm, setShowForm] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState(null);
+  const [editingCategory, setEditingCategory] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
 
   const isDarkMode = useSelector(selectIsDarkMode);
 
   useEffect(() => {
-    setIsVisible(true);
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
-  const sortedSuppliers = useMemo(() => {
-    let sortableSuppliers = [...suppliers];
+  const sortedCategories = useMemo(() => {
+    let sortableCategories = [...categories];
     if (sortConfig.key !== null) {
-      sortableSuppliers.sort((a, b) => {
+      sortableCategories.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
@@ -31,8 +32,8 @@ const SuppliersManagement = () => {
         return 0;
       });
     }
-    return sortableSuppliers;
-  }, [suppliers, sortConfig]);
+    return sortableCategories;
+  }, [categories, sortConfig]);
 
   const requestSort = (key) => {
     let direction = 'ascending';
@@ -42,45 +43,47 @@ const SuppliersManagement = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleDelete = (supplierId) => {
-    if (window.confirm('Are you sure you want to delete this supplier?')) {
-      setSuppliers(prevSuppliers => prevSuppliers.filter(supplier => supplier.id !== supplierId));
+  const handleDelete = (categoryId) => {
+    if (window.confirm('Are you sure you want to delete this category?')) {
+      setCategories(prevCategories => prevCategories.filter(category => category.id !== categoryId));
     }
   };
 
-  const handleEdit = (supplier) => {
-    setEditingSupplier(supplier);
+  const handleEdit = (category) => {
+    setEditingCategory(category);
     setShowForm(true);
   };
 
-  const handleAddOrUpdateSupplier = (newSupplier) => {
-    if (editingSupplier) {
-      setSuppliers(prevSuppliers =>
-        prevSuppliers.map(supplier =>
-          supplier.id === editingSupplier.id ? { ...supplier, ...newSupplier } : supplier
+  const handleAddOrUpdateCategory = (newCategory) => {
+    if (editingCategory) {
+      setCategories(prevCategories =>
+        prevCategories.map(category =>
+          category.id === editingCategory.id ? { ...category, ...newCategory } : category
         )
       );
     } else {
-      setSuppliers(prevSuppliers => [...prevSuppliers, { ...newSupplier, id: Date.now() }]);
+      setCategories(prevCategories => [...prevCategories, { ...newCategory, id: Date.now() }]);
     }
     setShowForm(false);
-    setEditingSupplier(null);
+    setEditingCategory(null);
   };
 
   return (
     <div 
-      className={`p-6 min-h-screen transition-opacity duration-500 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+      className={`transition-opacity duration-500 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
       style={{
         backgroundColor: 'var(--color-background)',
-        color: 'var(--color-text-primary)'
+        color: 'var(--color-text-primary)',
+        minHeight: '100vh',
+        padding: '1.5rem'
       }}
     >
-      <h1 className="text-3xl font-bold mb-6">Suppliers Management</h1>
+      <h1 className="text-3xl font-bold mb-6">Categories Management</h1>
       
       <div className="mb-6">
         <button
           onClick={() => {
-            setEditingSupplier(null);
+            setEditingCategory(null);
             setShowForm(true);
           }}
           className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
@@ -89,7 +92,7 @@ const SuppliersManagement = () => {
             color: "var(--color-text-primary)",
           }}
         >
-          <FiPlus className="inline-block mr-2" /> Add Supplier
+          <FiPlus className="inline-block mr-2" /> Add Category
         </button>
       </div>
 
@@ -102,7 +105,7 @@ const SuppliersManagement = () => {
         }}>
           <thead>
             <tr style={{ backgroundColor: 'var(--color-card-background)' }}>
-              {['Supplier Name', 'Contact Info', 'Actions'].map((header) => (
+              {['Category Name', 'Description', 'Actions'].map((header) => (
                 <th key={header} 
                     className="px-4 py-2 font-bold text-sm uppercase tracking-wider cursor-pointer hover:bg-opacity-80 transition duration-300"
                     style={{ 
@@ -120,23 +123,23 @@ const SuppliersManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {sortedSuppliers.map(supplier => (
-              <tr key={supplier.id} className="hover:bg-opacity-50 transition duration-300">
+            {sortedCategories.map(category => (
+              <tr key={category.id} className="hover:bg-opacity-50 transition duration-300">
                 <td className="px-4 py-2 text-sm font-medium" style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--table-border-color)' }}>
-                  {supplier.name}
+                  {category.name}
                 </td>
                 <td className="px-4 py-2 text-sm" style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--table-border-color)' }}>
-                  {supplier.contactInfo}
+                  {category.description}
                 </td>
                 <td className="px-4 py-2 text-sm" style={{ borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--table-border-color)' }}>
                   <button 
-                    onClick={() => handleEdit(supplier)}
+                    onClick={() => handleEdit(category)}
                     className="text-blue-500 hover:text-blue-600 mr-2 transition duration-300"
                   >
                     <FiEdit />
                   </button>
                   <button 
-                    onClick={() => handleDelete(supplier.id)}
+                    onClick={() => handleDelete(category.id)}
                     className="text-red-500 hover:text-red-600 transition duration-300"
                   >
                     <FiTrash2 />
@@ -149,23 +152,23 @@ const SuppliersManagement = () => {
       </div>
 
       {showForm && (
-        <SupplierForm
+        <CategoryForm
           onClose={() => {
             setShowForm(false);
-            setEditingSupplier(null);
+            setEditingCategory(null);
           }}
-          onSubmit={handleAddOrUpdateSupplier}
-          initialData={editingSupplier}
+          onSubmit={handleAddOrUpdateCategory}
+          initialData={editingCategory}
         />
       )}
     </div>
   );
 };
 
-const SupplierForm = ({ onClose, onSubmit, initialData }) => {
+const CategoryForm = ({ onClose, onSubmit, initialData }) => {
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
-    contactInfo: initialData?.contactInfo || ''
+    description: initialData?.description || ''
   });
 
   const handleChange = (e) => {
@@ -192,7 +195,7 @@ const SupplierForm = ({ onClose, onSubmit, initialData }) => {
           <FiX size={24} />
         </button>
         <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
-          {initialData ? 'Edit Supplier' : 'Add New Supplier'}
+          {initialData ? 'Edit Category' : 'Add New Category'}
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -201,7 +204,7 @@ const SupplierForm = ({ onClose, onSubmit, initialData }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Supplier Name"
+              placeholder="Category Name"
               className="w-full p-2 border rounded"
               style={{
                 backgroundColor: 'var(--color-input-background)',
@@ -210,12 +213,11 @@ const SupplierForm = ({ onClose, onSubmit, initialData }) => {
               }}
               required
             />
-            <input
-              type="text"
-              name="contactInfo"
-              value={formData.contactInfo}
+            <textarea
+              name="description"
+              value={formData.description}
               onChange={handleChange}
-              placeholder="Contact Info"
+              placeholder="Category Description"
               className="w-full p-2 border rounded"
               style={{
                 backgroundColor: 'var(--color-input-background)',
@@ -233,7 +235,7 @@ const SupplierForm = ({ onClose, onSubmit, initialData }) => {
               color: 'var(--color-text-primary)'
             }}
           >
-            {initialData ? 'Update Supplier' : 'Add Supplier'}
+            {initialData ? 'Update Category' : 'Add Category'}
           </button>
         </form>
       </div>
@@ -241,4 +243,4 @@ const SupplierForm = ({ onClose, onSubmit, initialData }) => {
   );
 };
 
-export default SuppliersManagement;
+export default CategoriesManagement;
